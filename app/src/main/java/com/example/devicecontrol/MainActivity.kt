@@ -1,6 +1,11 @@
  package com.example.devicecontrol
 
 import android.os.Bundle
+import android.os.Handler
+import android.widget.Button
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge

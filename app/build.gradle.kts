@@ -6,12 +6,12 @@ plugins {
 
 android {
     namespace = "com.example.devicecontrol"
-    compileSdk = 35
+    compileSdk = 33
 
     defaultConfig {
         applicationId = "com.example.devicecontrol"
-        minSdk = 27
-        targetSdk = 35
+        minSdk = 29
+        targetSdk = 33
         versionCode = 1
         versionName = "1.0"
 
