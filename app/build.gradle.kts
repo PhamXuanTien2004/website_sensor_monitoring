@@ -9,12 +9,12 @@ plugins {
 
 android {
     namespace = "com.example.devicecontrol"
-    compileSdk = 33
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.devicecontrol"
         minSdk = 29
-        targetSdk = 33
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -60,4 +60,5 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation ("com.github.mik3y:usb-serial-for-android:3.9.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
 }

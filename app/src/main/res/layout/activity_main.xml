@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageButton
+        android:id="@+id/imageButton"
+        android:layout_width="1621dp"
+        android:layout_height="1006dp"
+        android:background="@drawable/page0"
+        android:contentDescription="Nền giao diện chính"
+        android:onClick="hideThatShit"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/textView_opHourSet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="392dp"
+        android:layout_marginTop="296dp"
+        android:onClick="onClick"
+        android:text="00"
+        android:textColor="#FFFFFF"
+        android:textSize="120sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView_opColon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="296dp"
+        android:text=":"
+        android:textColor="#FFFFFF"
+        android:textSize="120sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@+id/textView_opHourSet"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView_opMinSet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="296dp"
+        android:onClick="onClick"
+        android:text="00"
+        android:textColor="#FFFFFF"
+        android:textSize="120sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@+id/textView_opColon"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/imageButton_opUp"
+        android:layout_width="125dp"
+        android:layout_height="125dp"
+        android:layout_marginStart="44dp"
+        android:background="#00FFFFFF"
+        android:contentDescription="Tăng thời gian phẫu thuật"
+        android:onClick="onClick"
+        android:scaleType="fitCenter"
+        android:src="@drawable/up_active"
+        app:layout_constraintBottom_toTopOf="@+id/imageButton_opDown"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <ImageButton
+        android:id="@+id/imageButton_opDown"
+        android:layout_width="125dp"
+        android:layout_height="125dp"
+        android:layout_marginStart="44dp"
+        android:layout_marginBottom="524dp"
+        android:background="#00FFFFFF"
+        android:contentDescription="Giảm thời gian phẫu thuật"
+        android:onClick="onClick"
+        android:scaleType="fitCenter"
+        android:src="@drawable/down_inactive"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/textView_anHourSet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="1032dp"
+        android:layout_marginTop="296dp"
+        android:onClick="onClick"
+        android:text="00"
+        android:textColor="#FFFFFF"
+        android:textSize="120sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView_anColon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="296dp"
+        android:text=":"
+        android:textColor="#FFFFFF"
+        android:textSize="120sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@+id/textView_anHourSet"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView_anMinSet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="296dp"
+        android:onClick="onClick"
+        android:text="00"
+        android:textColor="#FFFFFF"
+        android:textSize="120sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@+id/textView_anColon"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/imageButton_anUp"
+        android:layout_width="125dp"
+        android:layout_height="125dp"
+        android:layout_marginStart="1460dp"
+        android:layout_marginTop="236dp"
+        android:background="#00FFFFFF"
+        android:contentDescription="Tăng thời gian gây mê"
+        android:onClick="onClick"
+        android:scaleType="fitCenter"
+        android:src="@drawable/up_active"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/imageButton_anDown"
+        android:layout_width="125dp"
+        android:layout_height="125dp"
+        android:background="#00FFFFFF"
+        android:contentDescription="Giảm thời gian gây mê"
+        android:onClick="onClick"
+        android:scaleType="fitCenter"
+        android:src="@drawable/down_inactive"
+        app:layout_constraintBottom_toBottomOf="@+id/textView_anHourSet"
+        app:layout_constraintStart_toStartOf="@+id/imageButton_anUp"
+        app:layout_constraintTop_toBottomOf="@+id/imageButton_anUp" />
+
+
+    <TextView
+        android:id="@+id/textView_sensorTemp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="496dp"
+        android:layout_marginTop="604dp"
+        android:text="00.0"
+        android:textColor="#FFFFFF"
+        android:textSize="96sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView_sensorHum"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="200dp"
+        android:layout_marginTop="604dp"
+        android:text="00.0"
+        android:textColor="#FFFFFF"
+        android:textSize="96sp"
+        app:layout_constraintStart_toEndOf="@+id/textView_sensorTemp"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <ImageButton
+        android:id="@+id/buttonLight1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="828dp"
+        android:background="#00FFFFFF"
+        android:contentDescription="Bật hoặc tắt đèn 1"
+        android:minWidth="100dp"
+        android:minHeight="100dp"
+        android:onClick="onClick"
+        android:src="@drawable/light_off"
+        app:layout_constraintEnd_toStartOf="@+id/buttonLight2"
+        app:layout_constraintHorizontal_bias="0.918"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/buttonLight2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="666dp"
+        android:layout_marginTop="828dp"
+        android:background="#00FFFFFF"
+        android:contentDescription="Bật hoặc tắt đèn 2"
+        android:minWidth="100dp"
+        android:minHeight="100dp"
+        android:onClick="onClick"
+        android:src="@drawable/light_off"
+        app:layout_constraintStart_toStartOf="@+id/imageButton"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/buttonLightUV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="968dp"
+        android:layout_marginTop="828dp"
+
+        android:background="#00FFFFFF"
+        android:contentDescription="Bật hoặc tắt đèn UV"
+        android:minWidth="100dp"
+        android:minHeight="100dp"
+        android:onClick="onClick"
+        android:src="@drawable/uv_off"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/button_go"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:background="#00FFFFFF"
+        android:onClick="onClick"
+        tools:layout_editor_absoluteX="1451dp"
+        tools:layout_editor_absoluteY="55dp" />
+
+    <Button
+        android:id="@+id/button_setting"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="232dp"
+        android:background="#00FFFFFF"
+        android:onClick="onClick"
+        app:layout_constraintEnd_toStartOf="@id/button_go"
+        app:layout_constraintTop_toTopOf="@id/button_go" />
+
+    <ImageButton
+        android:id="@+id/buttonSys"
+        android:layout_width="97dp"
+        android:layout_height="116dp"
+        android:background="#00FFFFFF"
+        android:contentDescription="Cài đặt hệ thống"
+        android:minWidth="48dp"
+        android:minHeight="48dp"
+        android:onClick="onClick"
+        app:srcCompat="@drawable/sys_off"
+        tools:layout_editor_absoluteX="750dp"
+        tools:layout_editor_absoluteY="63dp" />
+
+    <TextView
+        android:id="@+id/textView_sensorPres"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#FFFFFF"
+        android:textSize="96sp"
+        android:visibility="gone"
+        tools:ignore="MissingConstraints"
+        tools:text="1013" />
+
+    <Button
+        android:id="@+id/button_uvSetting"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:background="#00FFFFFF"
+        android:onClick="onClick"
+        android:visibility="gone" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
