@@ -1,0 +1,481 @@
+<!-- File: app/templates/monitor/index.html -->
+{% extends "layouts/base.html" %} {% block content %}
+<div class="container-fluid">
+  <!-- Header: Thông tin người dùng -->
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-body p-4">
+          <h2 class="card-title text-primary mb-3">
+            <i class="bi bi-speedometer2 me-2"></i>Theo dõi: {{ user.fullname }}
+          </h2>
+          <div class="row text-muted">
+            <div class="col-md-4">
+              <p class="mb-1">
+                <i class="bi bi-person me-2"></i>Tên đăng nhập:
+                <strong>{{ user.username }}</strong>
+              </p>
+              <p class="mb-1">
+                <i class="bi bi-envelope me-2"></i>Email: {{ user.email }}
+              </p>
+            </div>
+            <div class="col-md-4">
+              <p class="mb-1">
+                <i class="bi bi-telephone me-2"></i>SĐT: {{ user.phone_number or
+                'Chưa cập nhật' }}
+              </p>
+              <p class="mb-1">
+                <i class="bi bi-broadcast me-2"></i>Topic:
+                <span class="badge bg-info text-dark"
+                  >{{ user.sub_topic or 'Chưa cấu hình' }}</span
+                >
+              </p>
+            </div>
+            <div class="col-md-4">
+              <p class="mb-1">
+                <i class="bi bi-hdd-network me-2"></i>Số lượng cảm biến:
+                <strong>{{ user.sensor_count }}</strong>
+              </p>
+              <div class="d-flex align-items-center mt-2">
+                <span class="me-2">Trạng thái:</span>
+                <span id="connection-status" class="badge bg-secondary"
+                  >Đang kết nối...</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Danh sách Cảm biến (Hiển thị dạng Grid) -->
+  <h4 class="mb-3 text-secondary border-bottom pb-2">
+    Thông số cảm biến thời gian thực
+  </h4>
+
+  <div class="row g-4 mb-5" id="sensor-grid">
+    {% if sensor_configs %} {% for config in sensor_configs %}
+    <div class="col-md-6 col-lg-4">
+      <div
+        class="card h-100 shadow-sm border-0 rounded-3 sensor-card"
+        id="sensor-card-{{ config.index }}"
+      >
+        <div
+          class="card-header bg-white border-bottom-0 pt-3 pb-0 d-flex justify-content-between align-items-center"
+          id="header-{{ config.index }}"
+        >
+          <h5 class="card-title mb-0 fw-bold text-dark">{{ config.name }}</h5>
+          <span class="badge bg-light text-secondary border"
+            >ID: {{ config.index }}</span
+          >
+        </div>
+        <div class="card-body text-center py-4">
+          <!-- Giá trị hiển thị -->
+          <h1
+            class="display-4 fw-bold mb-0"
+            id="sensor-value-{{ config.index }}"
+          >
+            --
+          </h1>
+          <p class="text-muted fs-5">{{ config.unit }}</p>
+
+          <!-- Biểu đồ Gauge -->
+          <div
+            style="
+              width: 200px;
+              height: 130px;
+              position: relative;
+              margin: 0 auto;
+            "
+          >
+            <canvas id="gauge-{{ config.index }}"></canvas>
+          </div>
+
+          <!-- Thanh trạng thái/Cảnh báo -->
+          <div class="mt-3">
+            <div class="progress" style="height: 6px">
+              <div
+                class="progress-bar bg-success"
+                role="progressbar"
+                style="width: 0%"
+                id="sensor-bar-{{ config.index }}"
+              ></div>
+            </div>
+            <div class="d-flex justify-content-between mt-1 small text-muted">
+              <span>Min: {{ config.min }}</span>
+              <span id="sensor-status-{{ config.index }}">Chờ dữ liệu</span>
+              <span>Max: {{ config.max }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %} {% else %}
+    <div class="col-12">
+      <div class="alert alert-warning text-center" role="alert">
+        <i class="bi bi-exclamation-triangle me-2"></i>Người dùng này chưa được
+        cấu hình danh sách cảm biến chi tiết.
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- KHU VỰC LỊCH SỬ DỮ LIỆU & CẢNH BÁO -->
+  <div class="row">
+    <!-- Bảng Lịch sử Dữ liệu (Bên Trái) -->
+    <div class="col-lg-6 mb-4">
+      <h4 class="mb-3 text-secondary border-bottom pb-2">Lịch sử dữ liệu</h4>
+      <div class="card shadow-sm border-0 rounded-3 h-100">
+        <div class="card-body p-0">
+          <div
+            class="table-responsive"
+            style="max-height: 400px; overflow-y: auto"
+          >
+            <table class="table table-hover mb-0 align-middle text-center">
+              <thead class="table-light sticky-top">
+                <tr>
+                  <th scope="col" class="ps-4">Thời gian</th>
+                  <th scope="col">ID</th>
+                  <th scope="col">Tên Cảm biến</th>
+                  <th scope="col">Giá trị</th>
+                </tr>
+              </thead>
+              <tbody id="data-history-body">
+                {% if data_list %} {% for reading in data_list %}
+                <!-- Thêm class 'historical-data' để JS dễ tìm -->
+                <tr
+                  class="historical-data"
+                  data-index="{{ reading.sensor_index }}"
+                  data-value="{{ reading.value }}"
+                  data-timestamp="{{ reading.timestamp }}"
+                >
+                  <td class="ps-4 text-muted">
+                    {{ reading.timestamp.strftime('%H:%M:%S %d/%m/%Y') }}
+                  </td>
+                  <td>
+                    <span class="badge bg-light text-dark border"
+                      >#{{ reading.sensor_index }}</span
+                    >
+                  </td>
+                  <td>
+                    {% set ns = namespace(found=false, name="Unknown", unit="")
+                    %} {% for cfg in sensor_configs %} {% if cfg.index ==
+                    reading.sensor_index %} {% set ns.name = cfg.name %} {% set
+                    ns.unit = cfg.unit %} {% endif %} {% endfor %}
+                    <span class="fw-bold text-secondary">{{ ns.name }}</span>
+                  </td>
+                  <td class="fw-bold">{{ reading.value }} {{ ns.unit }}</td>
+                </tr>
+                {% endfor %} {% else %}
+                <tr id="no-data-row">
+                  <td colspan="4" class="text-center py-4 text-muted">
+                    Chưa có dữ liệu.
+                  </td>
+                </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bảng Lịch sử Cảnh báo (Bên Phải - MỚI THÊM) -->
+    <div class="col-lg-6 mb-4">
+      <h4 class="mb-3 text-danger border-bottom pb-2">Lịch sử cảnh báo</h4>
+      <div
+        class="card shadow-sm border-0 rounded-3 h-100 border-danger border-top border-3"
+      >
+        <div class="card-body p-0">
+          <div
+            class="table-responsive"
+            style="max-height: 400px; overflow-y: auto"
+          >
+            <table class="table table-hover mb-0 align-middle text-center">
+              <thead class="table-light sticky-top">
+                <tr>
+                  <th scope="col">Thời gian</th>
+                  <th scope="col">Cảm biến</th>
+                  <th scope="col">Chi tiết</th>
+                  <th scope="col">Trạng thái</th>
+                </tr>
+              </thead>
+              <tbody id="alert-history-body">
+                {% if alert_list %} {% for alert in alert_list %}
+                <tr>
+                  <td class="text-muted">
+                    {{ alert.timestamp.strftime('%H:%M:%S %d/%m/%Y') }}
+                  </td>
+                  <td>
+                    {% set ns = namespace(name="#" ~ alert.sensor_index) %} {%
+                    for cfg in sensor_configs %} {% if cfg.index ==
+                    alert.sensor_index %} {% set ns.name = cfg.name %} {% endif
+                    %} {% endfor %}
+                    <span class="badge bg-warning text-dark"
+                      >{{ ns.name }}</span
+                    >
+                  </td>
+                  <td class="text-danger fw-bold">{{ alert.value }}</td>
+                  <td>
+                    {% if alert.sent %}
+                    <span class="badge bg-success"
+                      ><i class="bi bi-check-all"></i> Đã gửi</span
+                    >
+                    {% else %}
+                    <span class="badge bg-secondary">Chờ gửi</span>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endfor %} {% else %}
+                <tr id="no-alert-row">
+                  <td colspan="4" class="text-center py-4 text-muted">
+                    Chưa có cảnh báo nào.
+                  </td>
+                </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Script xử lý Real-time (Socket.IO) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      const socket = io();
+      const statusBadge = document.getElementById('connection-status');
+
+      const userId = {{ user.id_user }};
+      const sensorConfigs = {{ sensor_configs | tojson | safe }};
+      const subTopic = "{{ user.sub_topic }}";
+      const chartsMap = {};
+
+      // 1. KHỞI TẠO CHART
+      sensorConfigs.forEach(cfg => {
+          const ctx = document.getElementById(`gauge-${cfg.index}`);
+          if(!ctx) return;
+          const maxVal = cfg.max !== null ? cfg.max : 100;
+
+          const chart = new Chart(ctx, {
+              type: 'doughnut',
+              data: {
+                  labels: ['Val', 'Rest'],
+                  datasets: [{
+                      data: [0, maxVal],
+                      backgroundColor: ['#0d6efd', '#e9ecef'],
+                      borderWidth: 0,
+                      cutout: '80%',
+                      rotation: 270,
+                      circumference: 180
+                  }]
+              },
+              options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } }, animation: { duration: 800 } }
+          });
+          chartsMap[cfg.index] = { chart: chart, config: cfg };
+      });
+
+      // 2. KHÔI PHỤC GIÁ TRỊ TỪ LỊCH SỬ (QUAN TRỌNG)
+      const historyRows = document.querySelectorAll('.historical-data');
+      const latestValues = {};
+
+      historyRows.forEach(row => {
+          const idx = parseInt(row.dataset.index);
+          const val = parseFloat(row.dataset.value);
+
+          if (!latestValues.hasOwnProperty(idx)) {
+              latestValues[idx] = val;
+              updateSensorCard(idx, val);
+          }
+      });
+
+      // --- SOCKET IO EVENTS ---
+      socket.on('connect', () => {
+          statusBadge.textContent = 'Trực tuyến';
+          statusBadge.classList.replace('bg-secondary', 'bg-success');
+      });
+
+      socket.on('disconnect', () => {
+          statusBadge.textContent = 'Mất kết nối';
+          statusBadge.classList.replace('bg-success', 'bg-danger');
+      });
+
+      // 3. NHẬN DỮ LIỆU CẢM BIẾN MỚI
+      socket.on('update_monitor', (data) => {
+          if (data.topic === subTopic || data.device_id === subTopic) {
+               updateDashboard(data);
+          }
+      });
+
+      // 4. NHẬN CẢNH BÁO MỚI
+      socket.on('new_alert', (alertData) => {
+          if (alertData.user_id == userId) {
+              addAlertRow(alertData);
+          }
+      });
+
+      function updateDashboard(data) {
+          if (data.data && Array.isArray(data.data)) {
+               data.data.forEach(reading => {
+                  updateSensorCard(reading.index, reading.value);
+
+                  const config = sensorConfigs.find(c => c.index === reading.index);
+                  const name = config ? config.name : `Sensor #${reading.index}`;
+                  const unit = config ? config.unit : '';
+
+                  addHistoryRow(data.time, reading.index, name, reading.value, unit);
+               });
+          }
+      }
+
+      function updateSensorCard(index, value) {
+          const valueEl = document.getElementById(`sensor-value-${index}`);
+          const barEl = document.getElementById(`sensor-bar-${index}`);
+          const statusEl = document.getElementById(`sensor-status-${index}`);
+          const cardEl = document.getElementById(`sensor-card-${index}`);
+          const headerEl = document.getElementById(`header-${index}`);
+
+          const targetChartObj = chartsMap[index];
+
+          if (valueEl && targetChartObj) {
+              valueEl.textContent = value;
+              const config = targetChartObj.config;
+              const chart = targetChartObj.chart;
+
+              if (config) {
+                  let status = 'Bình thường';
+                  let colorClass = 'bg-success';
+                  let percent = 50;
+
+                  const min = config.min !== null ? config.min : 0;
+                  const max = config.max !== null ? config.max : 100;
+                  const range = max - min;
+                  if (range > 0) percent = Math.max(0, Math.min(100, ((value - min) / range) * 100));
+
+                  if ((config.min !== null && value < config.min) || (config.max !== null && value > config.max)) {
+                      status = 'Cảnh báo!';
+                      colorClass = 'bg-danger';
+                      cardEl.classList.add('border-danger');
+                      if(headerEl) {
+                          headerEl.classList.replace('bg-white', 'bg-danger');
+                          headerEl.classList.add('text-white');
+                          headerEl.querySelector('h5').classList.remove('text-dark');
+                          headerEl.querySelector('h5').classList.add('text-white');
+                      }
+                  } else {
+                      cardEl.classList.remove('border-danger');
+                      if(headerEl) {
+                          headerEl.classList.replace('bg-danger', 'bg-white');
+                          headerEl.classList.remove('text-white');
+                          headerEl.querySelector('h5').classList.remove('text-white');
+                          headerEl.querySelector('h5').classList.add('text-dark');
+                      }
+                  }
+
+                  if (barEl) {
+                      barEl.style.width = `${percent}%`;
+                      barEl.className = `progress-bar ${colorClass}`;
+                  }
+                  if (statusEl) {
+                      statusEl.textContent = status;
+                      statusEl.className = colorClass.replace('bg-', 'text-');
+                  }
+
+                  let drawVal = value - min;
+                  if (drawVal < 0) drawVal = 0;
+                  if (drawVal > range) drawVal = range;
+
+                  const chartColor = (colorClass === 'bg-danger') ? '#dc3545' : '#0d6efd';
+                  chart.data.datasets[0].data = [drawVal, range - drawVal];
+                  chart.data.datasets[0].backgroundColor = [chartColor, '#e9ecef'];
+                  chart.update();
+              }
+          }
+      }
+
+      function addHistoryRow(time, index, name, value, unit) {
+          const tbody = document.getElementById('data-history-body');
+          const noDataRow = document.getElementById('no-data-row');
+          if (noDataRow) noDataRow.remove();
+
+          const row = document.createElement('tr');
+          row.style.animation = "highlight 2s";
+
+          row.innerHTML = `
+              <td class="ps-4 text-muted">${time}</td>
+              <td><span class="badge bg-light text-dark border">#${index}</span></td>
+              <td><span class="fw-bold text-secondary">${name}</span></td>
+              <td class="fw-bold">${value} ${unit}</td>
+          `;
+
+          tbody.insertBefore(row, tbody.firstChild);
+
+          if (tbody.children.length > 50) {
+              tbody.removeChild(tbody.lastChild);
+          }
+      }
+
+      function addAlertRow(alertData) {
+          const tbody = document.getElementById('alert-history-body');
+          const noAlertRow = document.getElementById('no-alert-row');
+          if (noAlertRow) noAlertRow.remove();
+
+          const row = document.createElement('tr');
+          row.style.animation = "highlight-red 2s";
+
+          const config = sensorConfigs.find(c => c.index === alertData.sensor_index);
+          const sensorName = config ? config.name : `#${alertData.sensor_index}`;
+          const statusBadge = alertData.sent
+              ? '<span class="badge bg-success"><i class="bi bi-check-all"></i> Đã gửi</span>'
+              : '<span class="badge bg-secondary">Chờ gửi</span>';
+
+          row.innerHTML = `
+              <td class="text-muted">${alertData.timestamp}</td>
+              <td><span class="badge bg-warning text-dark">${sensorName}</span></td>
+              <td class="text-danger fw-bold">${alertData.value}</td>
+              <td>${statusBadge}</td>
+          `;
+
+          tbody.insertBefore(row, tbody.firstChild);
+          if (tbody.children.length > 20) tbody.removeChild(tbody.lastChild);
+      }
+
+      function updateTime() {
+          const now = new Date();
+          document.getElementById('digital-clock').innerText = now.toLocaleTimeString('vi-VN');
+      }
+      setInterval(updateTime, 1000);
+      updateTime();
+  });
+</script>
+
+<style>
+  @keyframes highlight {
+    0% {
+      background-color: #e8f5e9;
+    }
+    100% {
+      background-color: transparent;
+    }
+  }
+  @keyframes highlight-red {
+    0% {
+      background-color: #f8d7da;
+    }
+    100% {
+      background-color: transparent;
+    }
+  }
+  .sensor-card {
+    transition: transform 0.2s;
+  }
+  .sensor-card:hover {
+    transform: translateY(-5px);
+  }
+</style>
+{% endblock %}

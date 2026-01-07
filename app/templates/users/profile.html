@@ -1,0 +1,30 @@
+<!-- File: app/templates/users/profile.html -->
+{% extends "layouts/base.html" %} {% block content %}
+<div class="card shadow-sm border-0 rounded-3">
+  <div class="card-header bg-dark text-white text-center fs-5">
+    Thông tin cá nhân
+  </div>
+  <div class="card-body p-4">
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item">
+        <strong>Họ và tên:</strong> {{ user.fullname }}
+      </li>
+      <li class="list-group-item">
+        <strong>Tên đăng nhập:</strong> {{ user.username }}
+      </li>
+      <li class="list-group-item"><strong>Email:</strong> {{ user.email }}</li>
+      <li class="list-group-item"><strong>Tel:</strong> {{ user.phone_number }}</li>
+      <li class="list-group-item"><strong>Sub Topic:</strong> {{ user.sub_topic }}</li>
+      <li class="list-group-item"><strong>Sensor Number:</strong> {{ user.sensor_count }}</li>
+      <li class="list-group-item">
+        <strong>Vai trò:</strong>
+        {% if user.is_admin() %}
+        <span class="badge bg-danger">Quản trị viên (Admin)</span>
+        {% else %}
+        <span class="badge bg-secondary">Người dùng (User)</span>
+        {% endif %}
+      </li>
+    </ul>
+  </div>
+</div>
+{% endblock %}

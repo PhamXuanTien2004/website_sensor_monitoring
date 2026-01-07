@@ -1,0 +1,218 @@
+/* File: app/static/css/style.css */
+/* --- TÙY CHỈNH GIAO DIỆN CHUYÊN NGHIỆP --- */
+:root {
+    --primary-gradient: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    --secondary-bg: #f4f6f9;
+    --card-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    --navbar-height: 70px;
+    --primary-color: #0d6efd;
+    --text-color: #333;
+}
+
+body {
+    font-family: 'Inter', sans-serif; /* Hoặc 'Poppins' nếu bạn muốn giữ font cũ */
+    background-color: var(--secondary-bg);
+    color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Navbar & Logo */
+.navbar-custom {
+    background: var(--primary-gradient); /* Dùng gradient cho đẹp */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    padding: 0.5rem 0;
+    height: var(--navbar-height);
+}
+
+.navbar-brand {
+    font-weight: 600;
+    font-size: 1.25rem;
+    letter-spacing: 0.5px;
+    color: white !important; /* Chữ màu trắng trên nền tối */
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+}
+
+.navbar-brand:hover {
+    transform: scale(1.02);
+}
+
+/* Container Logo bo góc */
+.logo-container {
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+}
+
+.logo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Menu Mobile (Offcanvas) */
+.offcanvas-header {
+    border-bottom: 1px solid #eee;
+    background-color: #f8f9fa;
+}
+
+.offcanvas-title {
+    font-weight: 700;
+    color: #1e3c72;
+}
+
+/* Nav Links */
+.nav-link {
+    font-weight: 500;
+    padding: 0.5rem 1rem !important;
+    border-radius: 50px;
+    transition: all 0.2s;
+    color: rgba(255,255,255,0.9) !important; /* Màu chữ menu */
+    display: flex;
+    align-items: center;
+}
+
+/* Khi ở trong menu mobile (màn hình nhỏ), đổi màu chữ cho dễ đọc */
+@media (max-width: 991.98px) {
+    .nav-link {
+        color: #555 !important;
+        border-radius: 8px;
+        padding: 0.8rem 1rem !important;
+    }
+    .nav-link:hover, .nav-link.active {
+        background-color: #e9ecef;
+        color: var(--primary-color) !important;
+        transform: translateX(5px);
+    }
+    .nav-link i {
+        color: var(--primary-color);
+        font-size: 1.2rem;
+        margin-right: 12px;
+    }
+}
+
+/* Hiệu ứng hover trên Desktop */
+@media (min-width: 992px) {
+    .nav-link:hover {
+        color: #ffc107 !important;
+        background: rgba(255, 255, 255, 0.1);
+    }
+    .nav-link i {
+        margin-right: 5px; /* Khoảng cách icon trên desktop nhỏ hơn */
+    }
+}
+
+/* User Profile Badge (Desktop) */
+.user-pill {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(5px);
+    padding: 5px 15px;
+    border-radius: 30px;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: white;
+    display: flex;
+    align-items: center;
+}
+
+/* User Badge (Mobile) */
+.user-badge {
+    background: #eef2f7;
+    padding: 8px 16px;
+    border-radius: 50px;
+    color: #1e3c72;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Card Style chung */
+.content-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+    border: none;
+    overflow: hidden;
+}
+
+/* Flash Messages */
+.alert {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* Footer */
+footer {
+    margin-top: auto;
+    background: white;
+    border-top: 3px solid #1e3c72;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    color: #495057;
+    font-size: 0.9rem;
+}
+
+.footer-heading {
+    color: #1e3c72;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    letter-spacing: 0.5px;
+}
+
+.footer-info li {
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    line-height: 1.6;
+}
+
+.footer-info i {
+    color: var(--primary-color);
+    margin-top: 3px;
+    font-size: 1.1rem;
+}
+
+.social-icon {
+    font-size: 1.8rem;
+    margin-right: 1rem;
+    transition: transform 0.2s;
+    display: inline-block;
+}
+.social-icon:hover {
+    transform: translateY(-3px);
+}
+
+/* Nút bấm hiện đại */
+.btn-custom-light {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s;
+}
+.btn-custom-light:hover {
+    background: white;
+    color: #1e3c72;
+}
+
+/* Animation */
+.animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

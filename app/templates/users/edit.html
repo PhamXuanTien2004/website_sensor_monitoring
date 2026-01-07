@@ -1,0 +1,261 @@
+<!-- File: app/templates/users/edit.html -->
+{% extends "layouts/base.html" %} {% block content %}
+<div class="row justify-content-center mt-5">
+  <div class="col-md-8">
+    <div class="card shadow-sm rounded-lg border-0">
+      <div class="card-header bg-warning text-dark">
+        <h4 class="mb-0">
+          <i class="bi bi-pencil-square"></i> Chỉnh sửa thông tin
+        </h4>
+      </div>
+      <div class="card-body p-4">
+        <form method="POST" action="" novalidate id="edit-user-form">
+          <!-- Token CSRF ẩn -->
+          {{ form.hidden_tag() }}
+
+          <!-- 1. Thông tin cá nhân & Đăng nhập -->
+          <div class="row">
+            <div class="col-md-6">
+              <h5 class="text-primary mb-3">Thông tin tài khoản</h5>
+              <div class="mb-3">
+                {{ form.username.label(class="form-label fw-bold") }} {% if
+                form.username.errors %} {{ form.username(class="form-control
+                is-invalid") }}
+                <div class="invalid-feedback">
+                  {% for error in form.username.errors %}{{ error }}{% endfor %}
+                </div>
+                {% else %} {{ form.username(class="form-control") }} {% endif %}
+              </div>
+              <div class="mb-3">
+                {{ form.password.label(class="form-label fw-bold") }} {% if
+                form.password.errors %} {{ form.password(class="form-control
+                is-invalid") }}
+                <div class="invalid-feedback">
+                  {% for error in form.password.errors %}{{ error }}{% endfor %}
+                </div>
+                {% else %} {{ form.password(class="form-control") }} {% endif %}
+                <small class="text-muted"
+                  >Để trống nếu không muốn đổi mật khẩu.</small
+                >
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <h5 class="text-primary mb-3">Thông tin chi tiết</h5>
+              <div class="mb-3">
+                {{ form.fullname.label(class="form-label fw-bold") }} {% if
+                form.fullname.errors %} {{ form.fullname(class="form-control
+                is-invalid") }}
+                <div class="invalid-feedback">
+                  {% for error in form.fullname.errors %}{{ error }}{% endfor %}
+                </div>
+                {% else %} {{ form.fullname(class="form-control") }} {% endif %}
+              </div>
+              <div class="mb-3">
+                {{ form.email.label(class="form-label fw-bold") }} {% if
+                form.email.errors %} {{ form.email(class="form-control
+                is-invalid") }}
+                <div class="invalid-feedback">
+                  {% for error in form.email.errors %}{{ error }}{% endfor %}
+                </div>
+                {% else %} {{ form.email(class="form-control") }} {% endif %}
+              </div>
+              <div class="mb-3">
+                {{ form.phone_number.label(class="form-label fw-bold") }} {% if
+                form.phone_number.errors %} {{
+                form.phone_number(class="form-control is-invalid") }}
+                <div class="invalid-feedback">
+                  {% for error in form.phone_number.errors %}{{ error }}{%
+                  endfor %}
+                </div>
+                {% else %} {{ form.phone_number(class="form-control") }} {%
+                endif %}
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Cấu hình thiết bị -->
+          <h5 class="text-primary border-bottom pb-2 mb-3 mt-4">
+            3. Cấu hình thiết bị & Cảm biến
+          </h5>
+
+          <div class="mb-3">
+            {{ form.sub_topic.label(class="form-label fw-bold") }} {% if
+            form.sub_topic.errors %} {{ form.sub_topic(class="form-control
+            is-invalid") }}
+            <div class="invalid-feedback">
+              {% for error in form.sub_topic.errors %}{{ error }}{% endfor %}
+            </div>
+            {% else %} {{ form.sub_topic(class="form-control") }} {% endif %}
+          </div>
+
+          <!-- CẤU HÌNH CẢM BIẾN (PHẦN MỚI) -->
+          <div class="bg-light p-3 rounded border">
+            <div class="mb-3">
+              {{ form.sensor_count.label(class="form-label fw-bold") }} {% if
+              form.sensor_count.errors %} {{
+              form.sensor_count(class="form-control is-invalid",
+              id="sensor_count_input") }}
+              <div class="invalid-feedback">
+                {% for error in form.sensor_count.errors %}{{ error }}{% endfor
+                %}
+              </div>
+              {% else %} {{ form.sensor_count(class="form-control",
+              id="sensor_count_input") }} {% endif %}
+              <div class="form-text">
+                Thay đổi số lượng sẽ yêu cầu nhập lại tên các thông số.
+              </div>
+            </div>
+
+            <!-- Khu vực chứa các ô nhập tên cảm biến -->
+            <div id="sensor-configs-container"></div>
+
+            <!-- Trường ẩn lưu dữ liệu JSON cấu hình cảm biến -->
+            <input
+              type="hidden"
+              name="sensor_config_json"
+              id="sensor_config_json"
+            />
+
+            <!-- Trường ẩn lưu chuỗi tên (legacy) -->
+            {{ form.sensor_names_str(type="hidden",
+            id="sensor_names_str_hidden") }}
+          </div>
+
+          <hr class="my-4" />
+
+          <div class="d-flex justify-content-end gap-2">
+            <a href="{{ url_for('user.dashboard') }}" class="btn btn-secondary"
+              >Hủy bỏ</a
+            >
+            {{ form.submit(class="btn btn-primary px-4") }}
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Script xử lý nhập tên cảm biến động -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      const countInput = document.getElementById('sensor_count_input');
+      const container = document.getElementById('sensor-configs-container');
+      const hiddenNamesInput = document.getElementById('sensor_names_str_hidden');
+      const hiddenJsonInput = document.getElementById('sensor_config_json');
+      const form = document.getElementById('edit-user-form');
+
+      if (!countInput || !container || !hiddenJsonInput || !form) return;
+
+      // Dữ liệu cũ từ server (được truyền qua biến template current_configs)
+      // Ta chuyển nó thành JSON object an toàn trong JS
+      const currentData = {{ current_configs | tojson | safe }};
+      // currentData dạng: [{'index':1, 'name':'...', 'unit':'...', 'min':..., 'max':...}, ...]
+
+      function generateInputs(count) {
+          container.innerHTML = '';
+
+          if (count > 0 && count <= 20) {
+              for (let i = 1; i <= count; i++) {
+                  const row = document.createElement('div');
+                  row.className = 'row g-2 mb-2 align-items-end border-bottom pb-2';
+
+                  // Tìm dữ liệu cũ tương ứng với index này (nếu có)
+                  let oldVal = currentData.find(c => c.index === i) || {};
+                  let valName = oldVal.name || '';
+                  let valUnit = oldVal.unit || '';
+                  let valMin = (oldVal.min !== null && oldVal.min !== undefined) ? oldVal.min : '';
+                  let valMax = (oldVal.max !== null && oldVal.max !== undefined) ? oldVal.max : '';
+
+                  // Cột 1: Tên
+                  const colName = document.createElement('div');
+                  colName.className = 'col-md-5';
+                  colName.innerHTML = `
+                      <label class="form-label small text-muted mb-1">Tên Thông số ${i}</label>
+                      <input type="text" class="form-control form-control-sm sensor-name"
+                             placeholder="VD: Nhiệt độ ${i}" data-index="${i}" value="${valName}">
+                  `;
+
+                  // Cột 2: Đơn vị
+                  const colUnit = document.createElement('div');
+                  colUnit.className = 'col-md-2';
+                  colUnit.innerHTML = `
+                      <label class="form-label small text-muted mb-1">Đơn vị</label>
+                      <input type="text" class="form-control form-control-sm sensor-unit"
+                             placeholder="°C" value="${valUnit}">
+                  `;
+
+                  // Cột 3: Min
+                  const colMin = document.createElement('div');
+                  colMin.className = 'col-md-2';
+                  colMin.innerHTML = `
+                      <label class="form-label small text-muted mb-1">Min</label>
+                      <input type="number" step="0.1" class="form-control form-control-sm sensor-min"
+                             placeholder="0" value="${valMin}">
+                  `;
+
+                  // Cột 4: Max
+                  const colMax = document.createElement('div');
+                  colMax.className = 'col-md-3';
+                  colMax.innerHTML = `
+                      <label class="form-label small text-muted mb-1">Max</label>
+                      <input type="number" step="0.1" class="form-control form-control-sm sensor-max"
+                             placeholder="100" value="${valMax}">
+                  `;
+
+                  row.appendChild(colName);
+                  row.appendChild(colUnit);
+                  row.appendChild(colMin);
+                  row.appendChild(colMax);
+                  container.appendChild(row);
+              }
+          }
+      }
+
+      // Tạo ô nhập liệu ngay khi tải trang với dữ liệu cũ
+      if (countInput.value) {
+          generateInputs(parseInt(countInput.value));
+      }
+
+      // Lắng nghe sự kiện thay đổi số lượng
+      // (Nếu đổi số lượng, sẽ tạo ô mới và có thể mất dữ liệu cũ ở các ô chưa lưu,
+      // nhưng logic đơn giản là reset lại theo số mới)
+      countInput.addEventListener('input', function() {
+          const val = parseInt(this.value);
+          if (!isNaN(val)) generateInputs(val);
+          else container.innerHTML = '';
+      });
+
+      // Trước khi submit: Gom dữ liệu
+      form.addEventListener('submit', function() {
+          const rows = container.querySelectorAll('.row');
+          let namesList = [];
+          let fullConfig = [];
+
+          rows.forEach((row, index) => {
+              const nameInput = row.querySelector('.sensor-name');
+              const unitInput = row.querySelector('.sensor-unit');
+              const minInput = row.querySelector('.sensor-min');
+              const maxInput = row.querySelector('.sensor-max');
+
+              let name = nameInput.value.trim() || `Thông số ${index + 1}`;
+              let unit = unitInput.value.trim();
+              let minVal = minInput.value ? parseFloat(minInput.value) : null;
+              let maxVal = maxInput.value ? parseFloat(maxInput.value) : null;
+
+              namesList.push(name);
+              fullConfig.push({
+                  index: index + 1,
+                  name: name,
+                  unit: unit,
+                  min: minVal,
+                  max: maxVal
+              });
+          });
+
+          if (hiddenNamesInput) hiddenNamesInput.value = namesList.join(',');
+          if (hiddenJsonInput) hiddenJsonInput.value = JSON.stringify(fullConfig);
+      });
+  });
+</script>
+{% endblock %}

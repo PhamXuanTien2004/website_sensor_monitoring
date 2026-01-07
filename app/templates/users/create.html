@@ -1,0 +1,245 @@
+<!-- File: app/templates/users/create.html -->
+{% extends "layouts/base.html" %} {% block content %}
+<div class="card shadow-sm border-0 rounded-3">
+  <div class="card-body p-4 p-md-5">
+    <h2 class="card-title text-center mb-4 fs-3">Tạo người dùng mới</h2>
+
+    <!-- Thêm id="create-user-form" để JavaScript xử lý -->
+    <form method="POST" action="" novalidate id="create-user-form">
+      {{ form.hidden_tag() }}
+
+      <!-- 1. Thông tin cá nhân -->
+      <h5 class="text-primary border-bottom pb-2 mb-3">1. Thông tin cá nhân</h5>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          {{ form.fullname.label(class="form-label") }} {% if
+          form.fullname.errors %} {{ form.fullname(class="form-control
+          is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in form.fullname.errors %}{{ error }}{% endfor %}
+          </div>
+          {% else %} {{ form.fullname(class="form-control") }} {% endif %}
+        </div>
+        <div class="col-md-6 mb-3">
+          {{ form.email.label(class="form-label") }} {% if form.email.errors %}
+          {{ form.email(class="form-control is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in form.email.errors %}{{ error }}{% endfor %}
+          </div>
+          {% else %} {{ form.email(class="form-control") }} {% endif %}
+        </div>
+      </div>
+
+      <div class="mb-3">
+        {{ form.phone_number.label(class="form-label") }} {% if
+        form.phone_number.errors %} {{ form.phone_number(class="form-control
+        is-invalid") }}
+        <div class="invalid-feedback">
+          {% for error in form.phone_number.errors %}{{ error }}{% endfor %}
+        </div>
+        {% else %} {{ form.phone_number(class="form-control") }} {% endif %}
+      </div>
+
+      <!-- 2. Thông tin đăng nhập -->
+      <h5 class="text-primary border-bottom pb-2 mb-3 mt-4">
+        2. Thông tin đăng nhập
+      </h5>
+      <div class="mb-3">
+        {{ form.username.label(class="form-label") }} {% if form.username.errors
+        %} {{ form.username(class="form-control is-invalid") }}
+        <div class="invalid-feedback">
+          {% for error in form.username.errors %}{{ error }}{% endfor %}
+        </div>
+        {% else %} {{ form.username(class="form-control") }} {% endif %}
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          {{ form.password.label(class="form-label") }} {% if
+          form.password.errors %} {{ form.password(class="form-control
+          is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in form.password.errors %}{{ error }}{% endfor %}
+          </div>
+          {% else %} {{ form.password(class="form-control") }} {% endif %}
+        </div>
+        <div class="col-md-6 mb-3">
+          {{ form.confirm_password.label(class="form-label") }} {% if
+          form.confirm_password.errors %} {{
+          form.confirm_password(class="form-control is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in form.confirm_password.errors %}{{ error }}{% endfor
+            %}
+          </div>
+          {% else %} {{ form.confirm_password(class="form-control") }} {% endif
+          %}
+        </div>
+      </div>
+
+      <!-- 3. Cấu hình thiết bị -->
+      <h5 class="text-primary border-bottom pb-2 mb-3 mt-4">
+        3. Cấu hình thiết bị & Cảm biến
+      </h5>
+
+      <div class="mb-3">
+        {{ form.sub_topic.label(class="form-label") }} {% if
+        form.sub_topic.errors %} {{ form.sub_topic(class="form-control
+        is-invalid") }}
+        <div class="invalid-feedback">
+          {% for error in form.sub_topic.errors %}{{ error }}{% endfor %}
+        </div>
+        {% else %} {{ form.sub_topic(class="form-control", placeholder="VD:
+        lfs/device/01/response") }} {% endif %}
+      </div>
+
+      <!-- KHU VỰC CẤU HÌNH CẢM BIẾN ĐỘNG -->
+      <div class="bg-light p-3 rounded border">
+        <div class="mb-3">
+          <!-- SỬA TÊN BIẾN: dùng form.sensor_count thay vì sensor_number -->
+          {{ form.sensor_count.label(class="form-label fw-bold") }} {% if
+          form.sensor_count.errors %} {{ form.sensor_count(class="form-control
+          is-invalid", id="sensor_count_input") }}
+          <div class="invalid-feedback">
+            {% for error in form.sensor_count.errors %}{{ error }}{% endfor %}
+          </div>
+          {% else %} {{ form.sensor_count(class="form-control",
+          id="sensor_count_input", placeholder="Nhập số lượng (1-20)") }} {%
+          endif %}
+          <div class="form-text">
+            Nhập số lượng để hiển thị bảng cấu hình chi tiết bên dưới.
+          </div>
+        </div>
+
+        <!-- Container chứa các dòng nhập liệu động -->
+        <div id="sensor-configs-container"></div>
+
+        <!-- Trường ẩn để lưu dữ liệu gửi về server -->
+        <!-- Lưu chuỗi tên để tương thích code cũ -->
+        {{ form.sensor_names_str(type="hidden", id="sensor_names_str_hidden") }}
+
+        <!-- Lưu JSON đầy đủ (Name, Unit, Min, Max) để nâng cấp Controller sau này -->
+        <input
+          type="hidden"
+          name="sensor_config_json"
+          id="sensor_config_json"
+        />
+      </div>
+
+      <div class="d-grid mt-4">
+        {{ form.submit(class="btn btn-primary btn-lg") }}
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- JavaScript xử lý giao diện động -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const countInput = document.getElementById("sensor_count_input");
+    const container = document.getElementById("sensor-configs-container");
+    const hiddenNamesInput = document.getElementById("sensor_names_str_hidden");
+    const hiddenJsonInput = document.getElementById("sensor_config_json");
+    const form = document.getElementById("create-user-form");
+
+    if (!countInput || !container || !form) return;
+
+    // Hàm sinh giao diện
+    function generateInputs(count) {
+      container.innerHTML = ""; // Xóa nội dung cũ
+
+      if (count > 0 && count <= 20) {
+        for (let i = 1; i <= count; i++) {
+          // Tạo một dòng (row) cho mỗi cảm biến
+          const row = document.createElement("div");
+          row.className = "row g-2 mb-3 align-items-end border-bottom pb-2";
+
+          // Cột 1: Tên Thông Số (Rộng nhất)
+          const colName = document.createElement("div");
+          colName.className = "col-md-5";
+          colName.innerHTML = `
+                            <label class="form-label small text-muted mb-0">Tên Thông số ${i}</label>
+                            <input type="text" class="form-control form-control-sm sensor-name" 
+                                   placeholder="VD: Nhiệt độ" data-index="${i}">
+                        `;
+
+          // Cột 2: Đơn vị
+          const colUnit = document.createElement("div");
+          colUnit.className = "col-md-2";
+          colUnit.innerHTML = `
+                            <label class="form-label small text-muted mb-0">Đơn vị</label>
+                            <input type="text" class="form-control form-control-sm sensor-unit" 
+                                   placeholder="°C">
+                        `;
+
+          // Cột 3: Min
+          const colMin = document.createElement("div");
+          colMin.className = "col-md-2";
+          colMin.innerHTML = `
+                            <label class="form-label small text-muted mb-0">Min</label>
+                            <input type="number" step="0.1" class="form-control form-control-sm sensor-min" 
+                                   placeholder="0">
+                        `;
+
+          // Cột 4: Max
+          const colMax = document.createElement("div");
+          colMax.className = "col-md-3";
+          colMax.innerHTML = `
+                            <label class="form-label small text-muted mb-0">Max</label>
+                            <input type="number" step="0.1" class="form-control form-control-sm sensor-max" 
+                                   placeholder="100">
+                        `;
+
+          row.appendChild(colName);
+          row.appendChild(colUnit);
+          row.appendChild(colMin);
+          row.appendChild(colMax);
+          container.appendChild(row);
+        }
+      }
+    }
+
+    // Sự kiện khi nhập số lượng
+    countInput.addEventListener("input", function () {
+      const val = parseInt(this.value);
+      if (!isNaN(val)) generateInputs(val);
+      else container.innerHTML = "";
+    });
+
+    // Tự động điền lại nếu trang reload (ví dụ do lỗi validate form)
+    if (countInput.value) {
+      generateInputs(parseInt(countInput.value));
+    }
+
+    // Trước khi submit: Gom dữ liệu vào các trường ẩn
+    form.addEventListener("submit", function () {
+      const rows = container.querySelectorAll(".row");
+      let namesList = [];
+      let fullConfig = [];
+
+      rows.forEach((row, index) => {
+        const name =
+          row.querySelector(".sensor-name").value.trim() ||
+          `Thông số ${index + 1}`;
+        const unit = row.querySelector(".sensor-unit").value.trim();
+        const min = row.querySelector(".sensor-min").value;
+        const max = row.querySelector(".sensor-max").value;
+
+        // 1. Lưu tên vào danh sách (để tương thích code cũ)
+        namesList.push(name);
+
+        // 2. Lưu đầy đủ cấu hình vào JSON
+        fullConfig.push({
+          index: index + 1,
+          name: name,
+          unit: unit,
+          min: min ? parseFloat(min) : null,
+          max: max ? parseFloat(max) : null,
+        });
+      });
+
+      if (hiddenNamesInput) hiddenNamesInput.value = namesList.join(",");
+      if (hiddenJsonInput) hiddenJsonInput.value = JSON.stringify(fullConfig);
+    });
+  });
+</script>
+{% endblock %}

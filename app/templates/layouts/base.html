@@ -1,0 +1,282 @@
+<!-- File: app/templates/layouts/base.html -->
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Google Fonts (Inter - Font hiện đại, dễ đọc trên mobile) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <!-- Bootstrap Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+
+    <!-- CSS Tùy chỉnh (Đã tách ra file riêng) -->
+    <!-- Lưu ý: filename trỏ đến thư mục 'img' theo yêu cầu của bạn -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+
+    {% if title %}
+    <title>{{ title }} - LFS Monitor</title>
+    {% else %}
+    <title>LFS Monitor</title>
+    {% endif %}
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
+      <div class="container">
+        <!-- Logo & Brand -->
+        <a class="navbar-brand" href="{{ url_for('user.profile') }}">
+          <div class="logo-container">
+            <img
+              src="{{ url_for('static', filename='img/lfs.png') }}"
+              alt="Logo"
+              class="logo-img"
+            />
+          </div>
+          <span>LFS MONITOR</span>
+        </a>
+
+        <!-- Nút mở Menu Mobile -->
+        <button
+          class="navbar-toggler border-0"
+          type="button"
+          data-bs-toggle="offcanvas"
+          data-bs-target="#offcanvasNavbar"
+          aria-controls="offcanvasNavbar"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Nội dung Menu (Dạng trượt Offcanvas) -->
+        <div
+          class="offcanvas offcanvas-end"
+          tabindex="-1"
+          id="offcanvasNavbar"
+          aria-labelledby="offcanvasNavbarLabel"
+        >
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
+              Menu Hệ thống
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="offcanvas"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="offcanvas-body">
+            <ul class="navbar-nav justify-content-end flex-grow-1 pe-3 gap-2">
+              {% if current_user.is_authenticated %}
+
+              <!-- MENU ADMIN -->
+              {% if current_user.is_admin() %}
+              <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('user.dashboard') }}">
+                  <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('user.create_user') }}">
+                  <i class="bi bi-person-plus"></i> Thêm User
+                </a>
+              </li>
+
+              <!-- MENU USER -->
+              {% else %}
+              <li class="nav-item">
+                <!-- Sửa tên tham số thành user_id -->
+                <a
+                  class="nav-link"
+                  href="{{ url_for('user.follow_data', user_id=current_user.id_user) }}"
+                >
+                  <i class="bi bi-activity me-1"></i> Giám sát
+                </a>
+              </li>
+              {% endif %}
+
+              <!-- DIVIDER TRÊN MOBILE -->
+              <li class="nav-item d-lg-none"><hr /></li>
+
+              <!-- USER INFO & LOGOUT -->
+              <!-- Hiển thị khác nhau trên Mobile và Desktop nhờ CSS media query -->
+              <li
+                class="nav-item d-flex align-items-center ms-lg-3 mt-2 mt-lg-0"
+              >
+                <div class="user-pill d-none d-lg-flex">
+                  <!-- Desktop Pill -->
+                  <i class="bi bi-person-circle fs-5 me-2"></i>
+                  <span class="fw-bold">{{ current_user.username }}</span>
+                </div>
+                <div class="user-badge w-100 justify-content-center d-lg-none">
+                  <!-- Mobile Badge -->
+                  <i class="bi bi-person-circle"></i>
+                  <span>{{ current_user.username }}</span>
+                </div>
+              </li>
+              <li class="nav-item mt-2 mt-lg-0">
+                <a
+                  class="btn btn-sm btn-custom-light rounded-pill px-3 d-none d-lg-inline-block"
+                  href="{{ url_for('auth.logout') }}"
+                >
+                  <i class="bi bi-box-arrow-right"></i>
+                </a>
+                <a
+                  class="nav-link text-danger d-lg-none"
+                  href="{{ url_for('auth.logout') }}"
+                >
+                  <i class="bi bi-box-arrow-right text-danger"></i> Đăng xuất
+                </a>
+              </li>
+
+              {% else %}
+              <!-- KHÁCH -->
+              <li class="nav-item">
+                <a
+                  class="btn btn-primary w-100 mt-2 mt-lg-0 rounded-pill px-4"
+                  href="{{ url_for('auth.login') }}"
+                >
+                  <i class="bi bi-box-arrow-in-right me-2"></i> Đăng nhập
+                </a>
+              </li>
+              {% endif %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Nội dung chính -->
+    <main class="container mt-4 mb-5 flex-grow-1">
+      <div class="row justify-content-center">
+        <div class="col-md-12">
+          <!-- Flash Messages -->
+          {% with messages = get_flashed_messages(with_categories=true) %} {% if
+          messages %}
+          <div class="mb-4">
+            {% for category, message in messages %}
+            <div
+              class="alert alert-{{ category }} alert-dismissible fade show border-0 shadow-sm"
+              role="alert"
+            >
+              <div class="d-flex align-items-center">
+                {% if category == 'success' %}
+                <i class="bi bi-check-circle-fill fs-4 me-3 text-success"></i>
+                {% elif category == 'danger' %}
+                <i
+                  class="bi bi-exclamation-triangle-fill fs-4 me-3 text-danger"
+                ></i>
+                {% else %}
+                <i class="bi bi-info-circle-fill fs-4 me-3 text-info"></i>
+                {% endif %}
+                <div>{{ message }}</div>
+              </div>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close"
+              ></button>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %} {% endwith %}
+
+          <!-- Content Block -->
+          <div class="animate-fade-in">{% block content %}{% endblock %}</div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      <div class="container">
+        <div class="row gy-4">
+          <div class="col-lg-12">
+            <h6 class="footer-heading">
+              Công ty CP Nội thất và Dịch vụ phòng thí nghiệm Đông Dương
+            </h6>
+            <ul class="list-unstyled text-muted footer-info">
+              <li>
+                <i class="bi bi-geo-alt-fill"></i>
+                <div>
+                  <strong>VPHN:</strong> P407-408 Tòa nhà Thanh Hà, CC2A Bắc
+                  Linh Đàm, Hoàng Mai, Hà Nội
+                </div>
+              </li>
+              <li>
+                <i class="bi bi-geo-alt-fill"></i>
+                <div>
+                  <strong>VPHCM:</strong> Số 9C2/26, Cư Xá 304, Điện Biên Phủ,
+                  P.25, Q.Bình Thạnh, HCM
+                </div>
+              </li>
+              <li>
+                <i class="bi bi-gear-fill"></i>
+                <div>
+                  <strong>Xưởng SX:</strong> Km 14, QL 1A, Ngọc Hồi, Thanh Trì,
+                  Hà Nội
+                </div>
+              </li>
+              <li>
+                <i class="bi bi-telephone-fill"></i>
+                <div>
+                  <strong>Hotline:</strong>
+                  <span class="text-primary fw-bold"
+                    >0889159659 - 0946282848</span
+                  >
+                </div>
+              </li>
+              <li>
+                <i class="bi bi-envelope-fill"></i>
+                <div><strong>Email:</strong> sales@lfs.com.vn</div>
+              </li>
+              <li>
+                <i class="bi bi-globe"></i>
+                <div>
+                  <strong>Website:</strong>
+                  <a
+                    href="http://www.lfs.com.vn"
+                    target="_blank"
+                    class="text-decoration-none fw-bold"
+                    >www.lfs.com.vn</a
+                  >
+                </div>
+              </li>
+            </ul>
+
+            <div class="mt-4 pt-3 border-top text-center text-muted small">
+              &copy; 2025 LFS Lab Design & Service. Developed by Mega Digital.
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>
